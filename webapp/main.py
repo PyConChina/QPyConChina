@@ -74,9 +74,9 @@ PAGE_TEMP = """
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <meta name="description" content="">
 <meta name="author" content="">
+<script src="{{assets}}jquery.min.js"></script>
 <link href="{{assets}}bootstrap.min.css" rel="stylesheet" />
 <script src="{{assets}}bootstrap.min.js"></script>   
-<script src="{{assets}}jquery-2.1.4.min.js"></script>
 <script language='javascript'>
 $(document).ready(function(){
 %s
@@ -85,6 +85,7 @@ $(document).ready(function(){
 <style>
 ul{ list-style-type: none; margin:0px;padding:0px }
 tbody tr th:first-child{ width:80px }
+table.nolimit tbody tr th:first-child{ width:auto }
 .tt { padding-left:10px; }
 .center { text-align:center }
 .p5 { padding:5px }
@@ -116,7 +117,7 @@ def _get_json_content():
     return content
 
 def home():
-    JS = "alert('js')"
+    JS = ""
     CONTENT = """
 <nav class="navbar-inverse" role="navigation" id="navigation" style="background:#f9f9f9;border-bottom:1px solid #eee">
     <div class="container" >
@@ -127,7 +128,6 @@ def home():
             </a>     
             <div style="float:right;margin: 10px 10px 0 0;" >
                 <button onclick="milib.openUrl('http://cn.pycon.org/2015/donators.html')" class="btn btn-info" >
-                    <span class="glyphicon glyphicon-plus-sign"></span>
                     赞助大会
                 </button>                    
             </div>             
@@ -137,8 +137,26 @@ def home():
         <div style="padding:0px 15px 10px 15px">
                   PyCon 是全球 Pythoneer 最盛大的年度聚会,由 PSF(Python 基金会)支持,致力于营造愉快的多元化的 Python 技术主题大会. PyConChina 是由 CPyUG(华蠎用户组)获得授权举办的 中国PyCon 年会. 迄今已是第五届, 由 PyChina.org 发起,CPyUG/TopGeek 等社区协同,在 9月13~27日 (程序员节 前后), 北京/上海/广州 联办.
         </div>
+        
     </div>          
 </nav>
+<div style='text-align:center;padding:10px'>
+    <button onclick="location.href='/beijing/agenda'" class="btn btn-lg btn-success" >
+        PyCon 北京 
+    </button>
+</div>
+<div style='text-align:center;padding:10px'>
+    <button onclick="location.href='/shanghai/agenda'" class="btn btn-lg btn-success" >
+        PyCon 上海 
+    </button>
+</div>
+<div style='text-align:center;padding:10px'>
+    <button onclick="location.href='/shanghai/agenda'" class="btn btn-lg btn-success" >
+        PyCon 广州 
+    </button>
+</div>
+
+
 <script language='javascript'>milib.showDrawerMenu('{"menu":[{"title":"北京","url":"http://127.0.0.1:8080/beijing/agenda","icon":""},{"title":"上海","url":"http://127.0.0.1:8080/shanghai/agenda","icon":""},{"title":"广州","url":"http://127.0.0.1:8080/guangzhou/agenda","icon":""}]}')</script>
 """
 
@@ -146,32 +164,72 @@ def home():
 
 
 #############
-
-def speakers():
+def show_speakers():
     content = _get_json_content()
     jdata = json.loads(content)
-    title = u'演讲者'
-    T = "<h4 class='tt'>%s</h4>" % title
-    J = ""
-    for item in jdata['speakers'].values():
-        T = "%s<hr /><h5 class='p5'><img src='%s' style='height:32px'/> %s (%s)</h5>%s" % (T, item['avatar'], item['name'], (item.has_key('city') and item['city'] or ''),json2html.convert(json = item, table_attributes="class=\"table table-bordered table-hover\""))
-    return template(PAGE_TEMP % (J,T))
+    T = u"<h4 class='tt'>演讲者</h4>%s" % json2html.convert(json=jdata['speakers'], table_attributes="class=\"table table-bordered table-hover\"")
+    return template(PAGE_TEMP % ('',T))
 
+def get_speakers():
+    content = _get_json_content()
+    jdata = json.loads(content)
+    speakers = jdata['speakers']
+    return speakers
+    
 def beijing():
-    return _agenda('beijing',u'PyCon 北京日程')
+    return _agenda('beijing',u'PyCon 北京日程', u'http://event.31huiyi.com/118591776')
 
 def shanghai():
-    return _agenda('shanghai',u'PyCon 上海日程')
+    return _agenda('shanghai',u'PyCon 上海日程', u'http://event.31huiyi.com/118022165')
 
 def guangzhou():
-    return _agenda('guangzhou',u'PyCon 广州日程')
+    return _agenda('guangzhou',u'PyCon 广州日程', u'http://event.31huiyi.com/118545334')
 
-def _agenda(wh, title):
+def _agenda(wh, title, url):
     content = _get_json_content()
     jdata = json.loads(content)
-    J = ""
-    T = "<h4 class='tt'>%s</h4>%s" % (title, json2html.convert(json = jdata['agenda'][wh], table_attributes="class=\"table table-bordered table-hover\""))
-    return template(PAGE_TEMP % (J,T))
+    agd = jdata['agenda'][wh]
+    J = u"""
+$.get('/speakers/', null, function(data){
+$('th').each(function(){
+    var val = $(this).html()
+    if (val=='speaker') {
+        $(this).html('主题')
+    } else if (val == 'time') {
+        $(this).html('开始')
+    }
+});
+$('td').each(function(){
+    var val = $(this).html()
+    if (typeof(data[val])!="undefined") {
+        console.log(data[val]['topic']['title'])
+        $(this).html(data[val]['topic']['title']+" - "+data[val]['name']+"")
+    }
+})
+});"""
+    O = u"""<h4 class='tt'>%s</h4>
+<table class="table table-bordered table-hover">
+<tr><th>日期</th><td>%s</td></tr>
+<tr><th>地点</th><td>%s<br />%s</td></tr>
+<tr><th>交通</th><td>%s</td></tr>
+<tr><th>事件</th><td>%s</td></tr>
+<tr><th>注意</th><td>%s</td></tr>
+<tr><th>行程</th><td>%s</td></tr>
+</table>%s %s""" % (title, 
+    agd['date'],
+    agd['address'], 
+    agd["maplink"], 
+    agd['traffic'],
+    agd['venue'], 
+    agd['notices'], 
+    json2html.convert(json={"早上":agd['morning'],"中午":agd['noon'], "下午":agd["afternoon"]}, table_attributes="class=\"table table-bordered table-hover\""), 
+    json2html.convert(json={"取消":agd['cancel_talks']}, table_attributes="class=\"table table-bordered table-hover\""),
+    json2html.convert(json={"闪电":agd['lightening_talks']}, table_attributes="class=\"table table-bordered table-hover nolimit\"")
+)
+
+    L = u"""<div style='text-align:center;padding:10px'><button onclick="milib.openUrl('%s')" class="btn btn-lg btn-success" >报名参加</button></div>""" % url
+    
+    return template(PAGE_TEMP % (J,O+L))
 
 def work():
     redirect("https://qwork.quseit.cn")
@@ -180,7 +238,8 @@ def work():
 app = Bottle()
 app.route('/', method='GET')(home)
 app.route('/work', method='GET')(work)
-app.route('/speakers', method='GET')(speakers)
+app.route('/speakers/', method='GET')(get_speakers)
+app.route('/speakers/show/', method='GET')(show_speakers)
 app.route('/beijing/agenda', method='GET')(beijing)
 app.route('/shanghai/agenda', method='GET')(shanghai)
 app.route('/guangzhou/agenda', method='GET')(guangzhou)
