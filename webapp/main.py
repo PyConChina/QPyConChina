@@ -61,6 +61,10 @@ def __exit():
 def __ping():
     return "ok"
 
+def fonts_static(filepath):
+    return static_file(filepath, root=ROOT+'/fonts')
+
+
 def server_static(filepath):
     return static_file(filepath, root=ROOT+'/assets')
 
@@ -87,6 +91,7 @@ ul{ list-style-type: none; margin:0px;padding:0px }
 tbody tr th:first-child{ width:80px }
 table.nolimit tbody tr th:first-child{ width:auto }
 .tt { padding-left:10px; }
+.float-right { float:right }
 .center { text-align:center }
 .p5 { padding:5px }
 </style>
@@ -196,14 +201,16 @@ $('th').each(function(){
     if (val=='speaker') {
         $(this).html('主题')
     } else if (val == 'time') {
-        $(this).html('开始')
+        $(this).html('时间')
+    } else if (val == 'topic') {
+        $(this).html('')
     }
 });
 $('td').each(function(){
     var val = $(this).html()
     if (typeof(data[val])!="undefined") {
-        console.log(data[val]['topic']['title'])
-        $(this).html(data[val]['topic']['title']+" - "+data[val]['name']+"")
+        //console.log(data[val]['topic']['title'])
+        $(this).html(data[val]['topic']['title']+" - "+data[val]['name']+"<div style='color:grey'>"+data[val]['topic']['preview']+"</div>")
     }
 })
 });"""
@@ -214,20 +221,40 @@ $('td').each(function(){
 <tr><th>交通</th><td>%s</td></tr>
 <tr><th>事件</th><td>%s</td></tr>
 <tr><th>注意</th><td>%s</td></tr>
-<tr><th>行程</th><td>%s</td></tr>
-</table>%s %s""" % (title, 
+</table>
+""" % (title, 
     agd['date'],
     agd['address'], 
     agd["maplink"], 
     agd['traffic'],
     agd['venue'], 
-    agd['notices'], 
-    json2html.convert(json={"早上":agd['morning'],"中午":agd['noon'], "下午":agd["afternoon"]}, table_attributes="class=\"table table-bordered table-hover\""), 
-    json2html.convert(json={"取消":agd['cancel_talks']}, table_attributes="class=\"table table-bordered table-hover\""),
-    json2html.convert(json={"闪电":agd['lightening_talks']}, table_attributes="class=\"table table-bordered table-hover nolimit\"")
+    agd['notices']
 )
 
     L = u"""<div style='text-align:center;padding:10px'><button onclick="milib.openUrl('%s')" class="btn btn-lg btn-success" >报名参加</button></div>""" % url
+    M = u"<h5 class='tt'>早上</h5>"
+    
+    for item in agd['morning']:
+        M = M+json2html.convert(json=item, table_attributes="class=\"table table-bordered table-hover\"")
+
+    M = M+u"<h5 class='tt'>中午</h5>"
+    for item in agd['noon']:
+        M = M+json2html.convert(json=item, table_attributes="class=\"table table-bordered table-hover\"")
+    M = M+u"<h5 class='tt'>下午</h5>"
+    for item in agd['afternoon']:
+        M = M+json2html.convert(json=item, table_attributes="class=\"table table-bordered table-hover\"")
+    M = M+u"<h5 class='tt'>闪电演讲</h5>"
+    for item in agd['lightening_talks']:
+        M = M+json2html.convert(json=item, table_attributes="class=\"table table-bordered table-hover\"")
+    M = M+u"<h5 class='tt'>已取消</h5>"
+    for item in agd['cancel_talks']:
+        M = M+json2html.convert(json=item, table_attributes="class=\"table table-bordered table-hover\"")
+
+
+
+
+
+    O = O+M
     
     return template(PAGE_TEMP % (J,O+L))
 
@@ -246,6 +273,7 @@ app.route('/guangzhou/agenda', method='GET')(guangzhou)
 app.route('/__exit', method=['GET','HEAD'])(__exit)
 app.route('/__ping', method=['GET','HEAD'])(__ping)
 app.route('/assets/<filepath:path>', method='GET')(server_static)
+app.route('/fonts/<filepath:path>', method='GET')(fonts_static)
 
 try:
     server = MyWSGIRefServer(host="127.0.0.1", port="8080")
