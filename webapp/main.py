@@ -88,17 +88,19 @@ $(document).ready(function(){
 </script>
 <style>
 .placeholder { padding-top:10px;padding-bottom:10px }
+.col-xs-6, .col-sm-4 { padding:10px }
 ul{ list-style-type: none; margin:0px;padding:0px }
 tbody tr th:first-child{ width:80px }
 table.nolimit tbody tr th:first-child{ width:auto }
 .tt { padding-left:10px; }
 .float-right { float:right }
+.float-left { float:left }
 .center { text-align:center }
 .p5 { padding:5px }
 .circle {
-width: 150px;
+width: 100%%;
 height: 150px;
-border-radius: 10px; 
+border-radius: 1px; 
 border-color: 1px solid #ddd;
 border: solid 1px #ddd;
 }
@@ -141,7 +143,7 @@ def home():
     JS = ""
     CONTENT = """
 <nav class="navbar-inverse" role="navigation" id="navigation" style="background:#f9f9f9;border-bottom:1px solid #eee">
-    <div class="container" >
+    <div class="container">
         <ul>
             <a class="navbar-brand" style='color: #000;font-size: 23px;font-weight: bold;padding:10px;margin-left:0px' href="/a/qpython">
                 <img src="http://pyconcn.qiniucdn.com/zoomquiet/res/logo/150801-cnpycon-barnner-h80.png" height="32">
@@ -152,7 +154,6 @@ def home():
                     赞助大会
                 </button>                    
             </div>             
-            <div style="clear:both"></div>
         </ul>
         <div style="clear:both"></div>
         <div style="padding:0px 15px 10px 15px">
@@ -163,7 +164,7 @@ def home():
 </nav>
 <div class="table-responsive" style='border:0px'>  
   <div class="container">
-    <div class="row" style='border:0px'>
+    <div class="row" style='border:0px;padding-left:10px;padding-right:10px;padding-top:10px'>
 
           <div class="col-xs-6 col-sm-4 placeholder" onclick="location.href='/beijing/agenda'" >
             <div class="col-lg-4 circle circle-view">
@@ -260,7 +261,13 @@ $('td').each(function(){
     }
 })
 });"""
-    O = u"""<h4 class='tt'>%s</h4>
+    O = u"""<h4 class='tt float-left'>%s</h4>
+<div style="float:right;margin: 10px 10px 0 0;" >
+    <button onclick="milib.openUrl('%s')" class="btn btn-info" >
+        报名参加 
+    </button>                    
+</div>
+<div style='clear:both;padding-bottom:10px'></div>
 <table class="table table-bordered table-hover">
 <tr><th>日期</th><td>%s</td></tr>
 <tr><th>地点</th><td>%s<br />%s</td></tr>
@@ -269,6 +276,7 @@ $('td').each(function(){
 <tr><th>注意</th><td>%s</td></tr>
 </table>
 """ % (title, 
+    url,
     agd['date'],
     agd['address'], 
     agd["maplink"], 
@@ -297,12 +305,26 @@ $('td').each(function(){
         M = M+json2html.convert(json=item, table_attributes="class=\"table table-bordered table-hover\"")
 
 
+    D = u"""<div class="p5">
+<div class="page__disqus"><div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+    var disqus_shortname = 'cnpyconorg'; // required: replace example with your forum shortname
 
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+</div>
+"""
 
 
     O = O+M
     
-    return template(PAGE_TEMP % (J,O+L))
+    return template(PAGE_TEMP % (J,O+D))
 
 def work():
     redirect("https://qwork.quseit.cn")
