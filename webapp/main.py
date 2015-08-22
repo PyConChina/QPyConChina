@@ -87,6 +87,7 @@ $(document).ready(function(){
 });
 </script>
 <style>
+.btn-info { background-color:#ffe052;border-color:#ffe052;color:black}
 .placeholder { padding-top:10px;padding-bottom:10px }
 .col-xs-6, .col-sm-4 { padding:10px }
 ul{ list-style-type: none; margin:0px;padding:0px }
@@ -150,8 +151,8 @@ def home():
                 <span></span>                      
             </a>     
             <div style="float:right;margin: 10px 10px 0 0;" >
-                <button onclick="milib.openUrl('http://cn.pycon.org/2015/donators.html')" class="btn btn-info" >
-                    赞助大会
+                <button onclick="milib.openUrl('http://cn.pycon.org/2015/proposals.html')" class="btn btn-info" >
+                    提交主题
                 </button>                    
             </div>             
         </ul>
@@ -175,6 +176,7 @@ def home():
                 <a class="circle-text">
                     PyCon 北京 
                 </a>
+                <span style="color:grey;padding-left:15px;">火热报名中</span>
               </span>                    
             </div><!-- /.col-lg-4 -->
           </div>
@@ -188,6 +190,7 @@ def home():
                 <a class="circle-text" >
                     PyCon 上海 
                 </a>
+                <span style="color:grey;padding-left:15px;">火热报名中</span>
               </span>                    
             </div><!-- /.col-lg-4 -->
           </div>
@@ -201,6 +204,7 @@ def home():
                 <a class="circle-text" >
                     PyCon 广州 
                 </a>
+                <span style="color:grey;padding-left:15px;">火热报名中</span>
 
               </span>                    
             </div><!-- /.col-lg-4 -->
