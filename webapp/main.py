@@ -87,6 +87,7 @@ $(document).ready(function(){
 });
 </script>
 <style>
+.placeholder { padding-top:10px;padding-bottom:10px }
 ul{ list-style-type: none; margin:0px;padding:0px }
 tbody tr th:first-child{ width:80px }
 table.nolimit tbody tr th:first-child{ width:auto }
@@ -94,6 +95,21 @@ table.nolimit tbody tr th:first-child{ width:auto }
 .float-right { float:right }
 .center { text-align:center }
 .p5 { padding:5px }
+.circle {
+width: 150px;
+height: 150px;
+border-radius: 10px; 
+border-color: 1px solid #ddd;
+border: solid 1px #ddd;
+}
+.circle-view {
+background-color: #fdfdfd;
+}
+.circle-text {
+padding: 15px 15px 15px 15px;
+text-align: center;
+font-size:18px;
+}
 </style>
 </head>  
 <body>
@@ -145,23 +161,53 @@ def home():
         
     </div>          
 </nav>
-<div style='text-align:center;padding:10px'>
-    <button onclick="location.href='/beijing/agenda'" class="btn btn-lg btn-success" >
-        PyCon 北京 
-    </button>
-</div>
-<div style='text-align:center;padding:10px'>
-    <button onclick="location.href='/shanghai/agenda'" class="btn btn-lg btn-success" >
-        PyCon 上海 
-    </button>
-</div>
-<div style='text-align:center;padding:10px'>
-    <button onclick="location.href='/shanghai/agenda'" class="btn btn-lg btn-success" >
-        PyCon 广州 
-    </button>
-</div>
+<div class="table-responsive" style='border:0px'>  
+  <div class="container">
+    <div class="row" style='border:0px'>
 
+          <div class="col-xs-6 col-sm-4 placeholder" onclick="location.href='/beijing/agenda'" >
+            <div class="col-lg-4 circle circle-view">
+              <span style="">
+                <br />
+                <br />
+                <br />
+                <a class="circle-text">
+                    PyCon 北京 
+                </a>
+              </span>                    
+            </div><!-- /.col-lg-4 -->
+          </div>
 
+          <div class="col-xs-6 col-sm-4 placeholder" onclick="location.href='/shanghai/agenda'" >
+            <div class="col-lg-4 circle circle-view">
+              <span>
+                <br />
+                <br />
+                <br />
+                <a class="circle-text" >
+                    PyCon 上海 
+                </a>
+              </span>                    
+            </div><!-- /.col-lg-4 -->
+          </div>
+
+          <div class="col-xs-6 col-sm-4 placeholder" onclick="location.href='/shanghai/agenda'" >
+            <div class="col-lg-4 circle circle-view">
+              <span>
+                <br />
+                <br />
+                <br />
+                <a class="circle-text" >
+                    PyCon 广州 
+                </a>
+
+              </span>                    
+            </div><!-- /.col-lg-4 -->
+          </div>
+    </div>
+  </div>
+</div>
+                        
 <script language='javascript'>milib.showDrawerMenu('{"menu":[{"title":"北京","url":"http://127.0.0.1:8080/beijing/agenda","icon":""},{"title":"上海","url":"http://127.0.0.1:8080/shanghai/agenda","icon":""},{"title":"广州","url":"http://127.0.0.1:8080/guangzhou/agenda","icon":""}]}')</script>
 """
 
