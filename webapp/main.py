@@ -195,7 +195,7 @@ def home():
             </div><!-- /.col-lg-4 -->
           </div>
 
-          <div class="col-xs-6 col-sm-4 placeholder" onclick="location.href='/shanghai/agenda'" >
+          <div class="col-xs-6 col-sm-4 placeholder" onclick="location.href='/guangzhou/agenda'" >
             <div class="col-lg-4 circle circle-view">
               <span>
                 <br />
