@@ -146,7 +146,7 @@ def home():
 <nav class="navbar-inverse" role="navigation" id="navigation" style="background:#f9f9f9;border-bottom:1px solid #eee">
     <div class="container">
         <ul>
-            <a class="navbar-brand" style='color: #000;font-size: 23px;font-weight: bold;padding:10px;margin-left:0px' href="/a/qpython">
+            <a class="navbar-brand" style='color: #000;font-size: 23px;font-weight: bold;padding:10px;margin-left:0px' href="#">
                 <img src="http://pyconcn.qiniucdn.com/zoomquiet/res/logo/150801-cnpycon-barnner-h80.png" height="32">
                 <span></span>                      
             </a>     
@@ -442,7 +442,7 @@ body {
     border: 1px #eee solid;
     width: 100%%;
     overflow: scroll;
-    height:180px;
+    height:150px;
     margin-left: 1px;
 }
 #message {
