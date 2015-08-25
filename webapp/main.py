@@ -213,7 +213,7 @@ def home():
   </div>
 </div>
                         
-<script language='javascript'>milib.showDrawerMenu('{"menu":[{"title":"北京","url":"http://127.0.0.1:8080/beijing/agenda","icon":""},{"title":"上海","url":"http://127.0.0.1:8080/shanghai/agenda","icon":""},{"title":"广州","url":"http://127.0.0.1:8080/guangzhou/agenda","icon":""}]}')</script>
+<script language='javascript'>milib.showDrawerMenu('{"menu":[{"title":"北京","url":"http://127.0.0.1:8080/beijing/agenda","icon":""},{"title":"上海","url":"http://127.0.0.1:8080/shanghai/agenda","icon":""},{"title":"广州","url":"http://127.0.0.1:8080/guangzhou/agenda","icon":""},{"title":"聊天室（New）","url":"http://127.0.0.1:8080/chat","icon":""}]}')</script>
 """
 
     return template(PAGE_TEMP % (JS, CONTENT))
@@ -330,12 +330,199 @@ $('td').each(function(){
     
     return template(PAGE_TEMP % (J,O+D))
 
+def chat():
+    J="""
+    var connectToServer = function () {
+        //Connect to your server here
+        var mobileChatSocket = new SockJS('http://quseit.cn:6975/mobilechat');
+
+        mobileChatSocket.onopen = function () {
+            clearInterval(connectRetry);
+            $('.connect-status')
+                .removeClass('disconnected')
+                .addClass('connected')
+                .text('已连接');
+        };
+
+        //Receive message from server
+        mobileChatSocket.onmessage = function (e) {
+            $('#chatBox').html($('#chatBox').html() + '</br>' + e.data);
+            var objDiv = document.getElementById('chatBox');
+            objDiv.scrollTop = objDiv.scrollHeight;
+        };
+
+        mobileChatSocket.onclose = function () {
+            clearInterval(connectRetry);
+            connectRetry = setInterval(connectToServer, 1000);
+            $('.connect-status')
+                .removeClass('connected')
+                .addClass('disconnected')
+                .text('Disconnected');
+        };
+
+        //Send your message to the server.
+        $('#sendButton').on('click', function () {
+            if ($('#userName').val() != '') {
+                if ($('#messageBox').val() != '') {
+                    mobileChatSocket.send($('#userName').val() + ': ' + $('#messageBox').val());
+                    document.getElementById("messageBox").value = '';
+                }
+            } else {
+                alert('请先设置昵称');
+                var objDiv = document.getElementById('chatBox');
+                objDiv.scrollTop = objDiv.scrollHeight;
+            }
+        });
+
+        //Prevent enter refreshing the page, it sends the text from now on
+        $('#messageBox').keydown(function (e) {
+            if (e.keyCode == 13) { // 13 is enter
+                if ($('#userName').val() != '') {
+                    if ($('#messageBox').val() != '') {
+                        mobileChatSocket.send($('#userName').val() + ': ' + $('#messageBox').val());
+                        document.getElementById("messageBox").value = '';
+                    }
+                } else {
+                    alert('请先设置昵称');
+                    var objDiv = document.getElementById('chatBox');
+                    objDiv.scrollTop = objDiv.scrollHeight;
+                }
+                return false;
+            }
+        });
+
+        //Prevent enter refreshing the page
+        $('#messageBox').keydown(function (e) {
+            if (e.keyCode == 13) { // 13 is enter
+
+                return false;
+            }
+        });
+        $('#userName').bind('input propertychange', function() {
+            $('#mynick').html($(this).val())
+        });
+    };
+
+    var connectRetry = setInterval(connectToServer, 1000);
+"""
+    C="""
+<style>
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #f5f5f5;
+}
+.container {
+  width: auto;
+  max-width: 680px;
+  padding: 0 15px;
+}
+.container .text-muted {
+  margin: 20px 0;
+}
+#signInForm, #messageForm {
+    margin: 0px;
+    margin-bottom: 1px;
+}
+
+#chatBox {
+    padding:2px;
+    font-family: '宋体','Arial';
+    font-size: 13px;
+    color: black;
+    border: 1px #eee solid;
+    width: 100%%;
+    overflow: scroll;
+    height:180px;
+    margin-left: 1px;
+}
+#message {
+    width: 100%%;
+    height: 22px;
+    float: left;
+    margin-left: 1px;
+    margin-top: 1px;
+}
+
+.disconnected {
+    color: red;
+}
+.connected {
+    color: green;
+}
+.status {
+    font-size:13px
+}
+</style>
+
+    <div class="container">
+    <h4>PyConChina 聊天室 <span style='padding-top:5px' class="status">( 状态:<span class="connect-status disconnected">断线</span> )</span> <span style='font-size:13px'><a data-toggle="modal" data-target="#myModal" href='#' id='mynick' style='float:right'>设置昵称</a></span></h4>
+    <hr />
+    <span style='color:grey'>无认证，不存历史纪录，不支持刷新。<br/>想看看谁在？吼一嗓子。</span>
+    <div id="chatBox"></div>
+    
+
+    </div>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js"></script>
+
+    <footer class="footer">
+      <div class="container" style='padding-top:10px'>
+
+        
+        <form id="messageForm" class="form-group">
+            <input id="messageBox" type="text" value="" class='form-control' placeholder='回车发言'>
+            <!--input id="sendButton" type="button" value="发送" style="width:15%%;float:right" class="btn btn-success"-->
+        </form>
+      </div>
+    </footer>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+  <form id="signInForm" class="form-group">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               设置昵称
+            </h4>
+         </div>
+         <div class="modal-body">
+             <input id="userName" type="text" class='form-control'>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="changeNameButton" name="changeName" data-dismiss="modal">
+               设置昵称
+            </button>
+         </div>
+      </div><!-- /.modal-content -->
+  </form>
+</div><!-- /.modal -->
+
+
+"""
+    return template(PAGE_TEMP % (J,C))
+
 def work():
     redirect("https://qwork.quseit.cn")
 
 ######### WEBAPP ROUTERS ###############
 app = Bottle()
 app.route('/', method='GET')(home)
+app.route('/chat', method='GET')(chat)
 app.route('/work', method='GET')(work)
 app.route('/speakers/', method='GET')(get_speakers)
 app.route('/speakers/show/', method='GET')(show_speakers)
